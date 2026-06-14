@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loop Music Player</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#080808;
+    color:white;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.player{
+    width:min(90vw,600px);
+    background:#111;
+    border:2px solid #00ffff;
+    border-radius:20px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 0 25px #00ffff55;
+}
+
+.title{
+    font-size:28px;
+    margin-bottom:15px;
+    color:#00ffff;
+    text-shadow:0 0 10px #00ffff;
+}
+
+.drop{
+    border:3px dashed #00ffff;
+    border-radius:15px;
+    padding:35px;
+    transition:.2s;
+    cursor:pointer;
+}
+
+.drop.drag{
+    background:#00ffff22;
+    transform:scale(1.02);
+}
+
+.fileName{
+    margin-top:15px;
+    color:#aaa;
+    word-break:break-word;
+}
+
+audio{
+    width:100%;
+    margin-top:20px;
+}
+
+.controls{
+    margin-top:15px;
+}
+
+input[type=range]{
+    width:100%;
+}
+
+.small{
+    margin-top:10px;
+    color:#888;
+    font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="player">
+
+    <div class="title">🎵 Loop Music Player</div>
+
+    <div class="drop" id="drop">
+        Arraste uma música aqui<br><br>
+        ou clique para escolher
+        <input id="file" type="file" accept="audio/*" hidden>
+    </div>
+
+    <div class="fileName" id="fileName">
+        Nenhuma música carregada
+    </div>
+
+    <audio id="audio" controls loop></audio>
+
+    <div class="controls">
+        <p>Volume</p>
+        <input id="volume" type="range" min="0" max="100" value="100">
+    </div>
+
+    <div class="small">
+        Loop infinito ativado ♾️
+    </div>
+
+</div>
+
+<script>
+const drop = document.getElementById("drop");
+const fileInput = document.getElementById("file");
+const audio = document.getElementById("audio");
+const fileName = document.getElementById("fileName");
+const volume = document.getElementById("volume");
+
+function loadMusic(file){
+    if(!file || !file.type.startsWith("audio/")){
+        alert("Escolha um arquivo de áudio.");
+        return;
+    }
+
+    const url = URL.createObjectURL(file);
+
+    audio.src = url;
+    audio.loop = true;
+
+    fileName.textContent = file.name;
+
+    audio.play().catch(()=>{});
+}
+
+drop.onclick = () => fileInput.click();
+
+fileInput.onchange = () => {
+    loadMusic(fileInput.files[0]);
+};
+
+drop.addEventListener("dragover", e=>{
+    e.preventDefault();
+    drop.classList.add("drag");
+});
+
+drop.addEventListener("dragleave", ()=>{
+    drop.classList.remove("drag");
+});
+
+drop.addEventListener("drop", e=>{
+    e.preventDefault();
+    drop.classList.remove("drag");
+    loadMusic(e.dataTransfer.files[0]);
+});
+
+volume.addEventListener("input", ()=>{
+    audio.volume = volume.value / 100;
+});
+</script>
+
+</body>
+  </html>
